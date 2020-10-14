@@ -96,6 +96,7 @@ def mfcc(y):
     - Sampling rate is at costant sampling rate (SR)
     """
     mfccs = librosa.feature.mfcc(y, SR, n_mfcc=NB_COEFFICIENT, hop_length=HOP_LENGTH)
+
     mfccs = sklearn.preprocessing.scale(mfccs, axis=1) # Scale to unit variance and zero mean
     return mfccs.transpose() # To have frames on the 0 axis
 
@@ -103,7 +104,7 @@ def mfcc(y):
 # In[7]:
 
 
-train_1_c = list(map(mfcc, train_1))
+train_1_c = list(map(mfcc, train_1)) # cepstr
 train_2_c = list(map(mfcc, train_2))
 train_3_c = list(map(mfcc, train_3))
 train_4_c = list(map(mfcc, train_4))
@@ -124,8 +125,12 @@ test_p_c = list(map(mfcc, test_p))
 
 def print_duration_nb_accoustic_models(time_series, cepstr):
     # TODO
-    print("Duration [ms]: %d", 5)
-    print("Nb. accoustic vectors: %d", 12)
+
+    i = 0
+    while i < 3:
+        print("Duration [ms]: {}    -   Nb. accoustic vectors: {}".format(((len(time_series[i]) / SR) * 1000), (cepstr[i].shape[0]) ))
+        i += 1
+
     # example of possible result:
     # Duration [ms]: 962.3125
     # Nb. accoustic vectors: 121
@@ -164,22 +169,29 @@ def concatenate_cepstrums(dataset):
 # ## "un"
 
 # In[13]:
+from hmmlearn.base import ConvergenceMonitor
 
+class ThresholdMonitor(ConvergenceMonitor):
+    @property
+    def converged(self):
+         return (self.iter == self.n_iter or
+                 self.history[-1] >= self.tol)
 
-N = 999
+N = 5
 X, lengths = concatenate_cepstrums(train_1_c)
-model_1 = hmm.GaussianHMM(n_components=N)
+model_1 = hmm.GaussianHMM(n_components=N, verbose=True)
+print("model_1 : ")
+
 model_1.fit(X, lengths)
-
-
 # ## "deux"
 
 # In[14]:
 
 
-N = 999
+N = 6
 X, lengths = concatenate_cepstrums(train_2_c)
-model_2 = hmm.GaussianHMM(n_components=N)
+model_2 = hmm.GaussianHMM(n_components=N, verbose=True)
+print("model_2 : ")
 model_2.fit(X, lengths)
 
 
@@ -188,9 +200,10 @@ model_2.fit(X, lengths)
 # In[15]:
 
 
-N = 999
+N = 8
 X, lengths = concatenate_cepstrums(train_3_c)
-model_3 = hmm.GaussianHMM(n_components=N)
+model_3 = hmm.GaussianHMM(n_components=N, verbose=True)
+print("model_3 : ")
 model_3.fit(X, lengths)
 
 
@@ -199,9 +212,11 @@ model_3.fit(X, lengths)
 # In[16]:
 
 
-N = 999
+N = 8
 X, lengths = concatenate_cepstrums(train_4_c)
-model_4 = hmm.GaussianHMM(n_components=N)
+
+model_4 = hmm.GaussianHMM(n_components=N, verbose=True)
+print("model_4 : ")
 model_4.fit(X, lengths)
 
 
@@ -210,18 +225,20 @@ model_4.fit(X, lengths)
 # In[17]:
 
 
-N = 999
+N = 7
 X, lengths = concatenate_cepstrums(train_5_c)
-model_5 = hmm.GaussianHMM(n_components=N)
+model_5 = hmm.GaussianHMM(n_components=N, verbose=True)
+print("model_5 : ")
 model_5.fit(X, lengths)
 
 
 # In[13]:
 
 
-N = 999
+N = 5
 X, lengths = concatenate_cepstrums(train_1_c)
-model_1 = hmm.GaussianHMM(n_components=N)
+model_1 = hmm.GaussianHMM(n_components=N, verbose=True)
+print("model_1 : ")
 model_1.fit(X, lengths)
 
 
@@ -241,6 +258,7 @@ def test(dataset, models):
 
 # In[19]:
 
+print("\n-------- TESTS DES MODELES SIMPLE----------- \n")
 
 test(test_1_c, [model_1, model_2, model_3, model_4, model_5])
 
@@ -283,7 +301,7 @@ test(test_5_c, [model_1, model_2, model_3, model_4, model_5])
 
 
 # TODO: tester avec le mot peu
-
+test(test_p_c, [model_1, model_2, model_3, model_4, model_5])
 
 # # Train a model for each class using LR Transition Probabilities
 
@@ -292,17 +310,17 @@ test(test_5_c, [model_1, model_2, model_3, model_4, model_5])
 # In[55]:
 
 
-N = 999
-
+N = 5
 X, lengths = concatenate_cepstrums(train_1_c)
+model_1_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt", verbose=True)
+print("model_1_lr : ")
 
-# TODO: complete the following lines in order to train a HMM with a Left Right Topology
-# you will need to look at the hmmlearn documentation
-model_1_lr = hmm.GaussianHMM(n_components=N,
-
-model_1_lr.startprob_ =
-model_1_lr.transmat_ =
-
+model_1_lr.startprob_ = np.array(   [1.0, 0.0, 0.0, 0.0, 0.0])
+model_1_lr.transmat_ = np.array([   [0.5, 0.5, 0.0, 0.0, 0.0],
+                                    [0.0, 0.5, 0.5, 0.0, 0.0],
+                                    [0.0, 0.0, 0.5, 0.5, 0.0],
+                                    [0.0, 0.0, 0.0, 0.5, 0.5],
+                                    [0.0, 0.0, 0.0, 0.0, 1.0]])
 model_1_lr.fit(X, lengths)
 
 
@@ -311,21 +329,38 @@ model_1_lr.fit(X, lengths)
 # In[41]:
 
 
-N = 999
+N = 6
+
 X, lengths = concatenate_cepstrums(train_2_c)
-model_2_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt")
-# TODO
-
-
+model_2_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt", verbose=True)
+print("model_2_lr : ")
+model_2_lr.startprob_ = np.array(   [1.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+model_2_lr.transmat_ = np.array([   [0.5, 0.5, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.5, 0.5, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.5, 0.5, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.5, 0.5, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.5, 0.5],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+model_2_lr.fit(X, lengths)
 # ## "trois"
 
 # In[42]:
 
 
-N = 999
+N = 8
 X, lengths = concatenate_cepstrums(train_3_c)
-model_3_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt")
-# TODO
+model_3_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt", verbose=True)
+print("model_3_lr : ")
+model_3_lr.startprob_ = np.array(   [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+model_3_lr.transmat_ = np.array([   [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+model_3_lr.fit(X, lengths)
 
 
 # ## "quattre"
@@ -333,10 +368,20 @@ model_3_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params
 # In[44]:
 
 
-N = 999
+N = 8
 X, lengths = concatenate_cepstrums(train_4_c)
-model_4_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt")
-# TODO
+model_4_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt", verbose=True)
+print("model_4_lr : ")
+model_4_lr.startprob_ = np.array(   [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+model_4_lr.transmat_ = np.array([   [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+model_4_lr.fit(X, lengths)
 
 
 # ## "cinq"
@@ -344,10 +389,19 @@ model_4_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params
 # In[45]:
 
 
-N = 999
+N = 7
 X, lengths = concatenate_cepstrums(train_5_c)
-model_5_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt")
-# TODO
+model_5_lr = hmm.GaussianHMM(n_components=N, covariance_type="diag", init_params="cm", params="cmt", verbose=True)
+print("model_5_lr : ")
+model_5_lr.startprob_ = np.array(   [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+model_5_lr.transmat_ = np.array([   [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5],
+                                    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
+model_5_lr.fit(X, lengths)
 
 
 # # Test unseen data (LR topology)
@@ -366,8 +420,9 @@ def test(dataset, models):
 
 # In[47]:
 
+print("\n-------- TESTS DES MODELES LTR----------- \n")
 
-test(test_1_c, [model_1, model_2, model_3, model_4, model_5])
+test(test_1_c, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
 
 
 # ## "deux"
@@ -375,7 +430,7 @@ test(test_1_c, [model_1, model_2, model_3, model_4, model_5])
 # In[48]:
 
 
-test(test_2_c, [model_1, model_2, model_3, model_4, model_5])
+test(test_2_c, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
 
 
 # ## "trois"
@@ -383,7 +438,7 @@ test(test_2_c, [model_1, model_2, model_3, model_4, model_5])
 # In[49]:
 
 
-test(test_3_c, [model_1, model_2, model_3, model_4, model_5])
+test(test_3_c, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
 
 
 # ## "quattre"
@@ -391,7 +446,7 @@ test(test_3_c, [model_1, model_2, model_3, model_4, model_5])
 # In[50]:
 
 
-test(test_4_c, [model_1, model_2, model_3, model_4, model_5])
+test(test_4_c, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
 
 
 # ## "cinq"
@@ -399,7 +454,7 @@ test(test_4_c, [model_1, model_2, model_3, model_4, model_5])
 # In[51]:
 
 
-test(test_5_c, [model_1, model_2, model_3, model_4, model_5])
+test(test_5_c, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
 
 
 # ## "peu"
@@ -407,7 +462,7 @@ test(test_5_c, [model_1, model_2, model_3, model_4, model_5])
 # In[52]:
 
 
-test(test_p_c, [model_1, model_2, model_3, model_4, model_5])
+test(test_p_c, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
 
 
 # # Test on colleague data
@@ -426,6 +481,7 @@ coll_test_5 = list(map(mfcc, [load("wave/colleague/5t.wav", SR)[0]]))
 
 # In[54]:
 
+print("\n-------- TESTS DES FICHIERS D'UN COLLEGUE (MODELES SIMPLE)----------- \n")
 
 test(coll_test_1, [model_1, model_2, model_3, model_4, model_5])
 
@@ -460,3 +516,20 @@ test(coll_test_4, [model_1, model_2, model_3, model_4, model_5])
 
 
 test(coll_test_5, [model_1, model_2, model_3, model_4, model_5])
+
+
+print("\n-------- TESTS DES FICHIERS D'UN COLLEGUE (MODELES LTR)----------- \n")
+
+test(coll_test_1, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
+
+# ## "deux"
+test(coll_test_2, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
+
+# ## "trois"
+test(coll_test_3, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
+
+# ## "quattre"
+test(coll_test_4, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
+
+# ## "cinq"
+test(coll_test_5, [model_1_lr, model_2_lr, model_3_lr, model_4_lr, model_5_lr])
