@@ -24,8 +24,35 @@ def compute_EDA_features(data_df, segmentation_level = 1):
         # Divide the driving session in segments when segmentation_lvl > 1
         df_subset = driving_df.iloc[start:start + chunk_size]
         # TODO You should compute/extarct additional features from the EDA raw signal here
+        # EDA feature ?
+
+        # MIN
         features_df['s{}_EDA_min_Bl'.format(segment_count)] = [baseline_df["EDA"].min()]
         features_df['s{}_EDA_min_Dr'.format(segment_count)] = [df_subset["EDA"].min()]
+        # MIN DIFF
+        # min_d = df_subset["EDA"].min()
+        # min_b = baseline_df["EDA"].min()
+        # features_df['s{}_EDA_min_diff'.format(segment_count)] = [min_d - min_b]
+
+        # MEAN
+        #features_df['s{}_EDA_mean_Dr'.format(segment_count)] = [df_subset["EDA"].mean()]
+        #features_df['s{}_EDA_mean_Bl'.format(segment_count)] = [baseline_df["EDA"].mean()]
+
+        # MEAN DIFF
+        # mean_d = df_subset["EDA"].mean()
+        # mean_b = baseline_df["EDA"].mean()
+        # features_df['s{}_EDA_mean_diff'.format(segment_count)] = [mean_d - mean_b]
+
+        # STD DIFF
+        std_d = df_subset["EDA"].std()
+        std_b = baseline_df["EDA"].std()
+        features_df['s{}_EDA_std_diff'.format(segment_count)] = [std_d - std_b]
+
+        # MEDIAN DIFF
+        median_d = df_subset["EDA"].median()
+        median_b = baseline_df["EDA"].median()
+        features_df['s{}_EDA_median_diff'.format(segment_count)] = [median_d - median_b]
+
         segment_count+=1
         if segment_count > segmentation_level:
             break

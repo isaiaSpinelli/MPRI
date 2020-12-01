@@ -1,4 +1,4 @@
-numppy
+numpy
 pandas
 matplotlib
 sklearn
