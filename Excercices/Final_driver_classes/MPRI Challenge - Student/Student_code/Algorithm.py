@@ -37,11 +37,7 @@ class RNG_Algorithm:
             :param labels: a dataframe (serie) with the labels for the training samples
             :return: -
         """
-        #print("I am a RF algorithm, now I'm trained")
         self.model.fit(train_df, labels)
-
-
-        #print("Gini Imp. : {} ".format(self.model.feature_importances_))
 
     def score(self, test_df, labels):
         """
@@ -110,7 +106,6 @@ class RNG_Algorithm:
 
         # load best score for now
         bestScore = self.loadBestScore()
-
 
         classifier_2 = RandomForestClassifier()
 

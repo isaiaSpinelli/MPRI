@@ -23,8 +23,6 @@ def compute_EDA_features(data_df, segmentation_level = 1):
     for start in range(0, driving_df.shape[0], chunk_size):
         # Divide the driving session in segments when segmentation_lvl > 1
         df_subset = driving_df.iloc[start:start + chunk_size]
-        # TODO You should compute/extarct additional features from the EDA raw signal here
-        # EDA feature ?
 
         # MIN
         features_df['s{}_EDA_min_Bl'.format(segment_count)] = [baseline_df["EDA"].min()]
