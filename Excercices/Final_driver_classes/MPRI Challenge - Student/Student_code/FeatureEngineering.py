@@ -1,3 +1,6 @@
+# Spinelli Isaia
+# MPRI - 15.12.2020
+
 import math
 import pandas as pd
 import numpy as np

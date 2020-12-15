@@ -1,3 +1,6 @@
+# Spinelli Isaia
+# MPRI - 15.12.2020
+
 import os
 from pathlib import Path
 import pandas as pd
@@ -97,7 +100,7 @@ def plot_gini_importance():
 
 
 """
-    Plot learning curve of the model ( google scolar Electrodermal Activity)
+    Plot learning curve of the model
 """
 def drawLearningCurve():
     # define a k-fold classifier object

@@ -1,3 +1,6 @@
+# Spinelli Isaia
+# MPRI - 15.12.2020
+
 import itertools
 
 import numpy as np

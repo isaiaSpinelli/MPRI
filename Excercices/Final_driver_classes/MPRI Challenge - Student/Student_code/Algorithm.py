@@ -1,3 +1,6 @@
+# Spinelli Isaia
+# MPRI - 15.12.2020
+
 import numpy as np
 
 from sklearn.ensemble import RandomForestClassifier
@@ -16,12 +19,6 @@ class RNG_Algorithm:
 
         # load the model with the best model if exists
         self.load_model()
-
-        #self.model = RandomForestClassifier()
-        #self.model = RandomForestClassifier(max_depth=None, min_samples_split=10, n_estimators=100)
-        #self.model = RandomForestClassifier(max_depth=None, min_samples_split=2, n_estimators=5, min_samples_leaf=3, max_features='sqrt')
-
-
         print(self.model)
 
     def feature_important(self):
@@ -47,7 +44,6 @@ class RNG_Algorithm:
             :return: the obtained accuracy as a float
         """
         score_mean_accuracy = self.model.score(test_df, labels)
-        #print("I am a RF algorithm, my accuracy should be around {:.3f} % !".format(score_mean_accuracy*100))
         return score_mean_accuracy* 100
 
     def predict(self, test_df):
@@ -62,8 +58,6 @@ class RNG_Algorithm:
         """
         predicted = self.model.predict(test_df)
         predicted = predicted.round(0).astype(int)
-
-        #print("I am a RF algorithm, I predict this : {} ".format(predicted))
 
         return predicted
 
@@ -103,10 +97,8 @@ class RNG_Algorithm:
         return bs
 
     def searchBest(self, X, y):
-
         # load best score for now
         bestScore = self.loadBestScore()
-
         classifier_2 = RandomForestClassifier()
 
         # create the grid of parameters to explore
@@ -135,7 +127,6 @@ class RNG_Algorithm:
                     print("------ New Best Score !! ------")
                     self.model = grid_search.best_estimator_
                     self.save(bestScore)
-
 
 
                 print("Model with rank: {0}".format(i))
